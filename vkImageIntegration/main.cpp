@@ -124,6 +124,7 @@ int main()
 	computeQ = dev.getQueue(devqInfo.queueFamilyIndex, 0);
 
 
+	dev.destroy();
 
     instance.destroy();
 
