@@ -1,31 +1,66 @@
-/*
- * Vulkan Program
- *
- * Copyright (C) 2016 Valve Corporation
- * Copyright (C) 2016 LunarG, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
-Vulkan C++ Project Template
-Create and destroy a simple Vulkan instance.
-*/
-
 #include <vulkan/vulkan.hpp>
 
 #include <iostream>
 #include <vector>
+
+
+using namespace std;
+
+
+bool check_queue_support(vk::QueueFamilyProperties q_fam) {
+	bool supports_compute = false;
+	bool supports_transfer = false;
+
+	supports_compute = bool(vk::QueueFlagBits::eCompute & q_fam.queueFlags) || supports_compute;
+	supports_transfer = bool(vk::QueueFlagBits::eTransfer & q_fam.queueFlags) || supports_transfer;
+
+	std::cout << "Queue number: " + to_string(q_fam.queueCount) << endl;
+	std::cout << "Queue flags: " + to_string(q_fam.queueFlags) << endl;
+
+	return supports_transfer && supports_compute;
+}
+
+vector<uint32_t> get_supported_queues(vk::PhysicalDevice pd) {
+	
+	std::cout << "Device: " + string(pd.getProperties().deviceName) << endl;
+	vector<uint32_t> supported_queues;
+
+	auto queues = pd.getQueueFamilyProperties();
+	for (size_t i = 0; i < queues.size(); i++)
+	{
+		if (check_queue_support(queues[i]))
+		{
+			supported_queues.push_back(i);
+		}
+	}
+	
+
+
+	return supported_queues;
+}
+
+struct device_queues
+{
+	vk::PhysicalDevice pdev;
+	vector<uint32_t> q_idxs;
+};
+
+std::vector<device_queues> get_supported_devices(vk::Instance instance) {
+	std::vector<vk::PhysicalDevice> devices{ instance.enumeratePhysicalDevices() };
+	std::vector<device_queues> supported_devices;
+
+	for (vk::PhysicalDevice pd : devices) {
+		auto supported_qs = get_supported_queues(pd);
+		if (supported_qs.size() > 0){
+			device_queues d;
+			d.pdev = pd;
+			d.q_idxs = supported_qs;
+			supported_devices.push_back(d);
+		}
+	}
+
+	return supported_devices;
+}
 
 int main()
 {
@@ -38,9 +73,9 @@ int main()
     // VkApplicationInfo allows the programmer to specifiy some basic information about the
     // program, which can be useful for layers and tools to provide more debug information.
     vk::ApplicationInfo appInfo = vk::ApplicationInfo()
-        .setPApplicationName("Vulkan C++ Program Template")
+        .setPApplicationName("Test driver for vkImageIntegrationLib")
         .setApplicationVersion(1)
-        .setPEngineName("LunarG SDK")
+        .setPEngineName("vkImageIntegration")
         .setEngineVersion(1)
         .setApiVersion(VK_API_VERSION_1_0);
 
@@ -63,10 +98,36 @@ int main()
         return 1;
     }
 
-    // Normally, a program would do something with the instance here. This, however, is just a
-    // simple demo program, so we just finish up right away.
+	auto devices = get_supported_devices(instance);
+	
+	//setup queue info
+	vk::DeviceQueueCreateInfo devqInfo = vk::DeviceQueueCreateInfo();
+	devqInfo.queueFamilyIndex = devices[0].q_idxs[0];
+	devqInfo.queueCount = 1;
+	float q_priority = 1.0f;
+	devqInfo.pQueuePriorities = &q_priority;
+
+	//select features
+	vk::PhysicalDeviceFeatures devFeatures = vk::PhysicalDeviceFeatures();
+
+	vk::DeviceCreateInfo devCreateInfo = vk::DeviceCreateInfo();
+	devCreateInfo.pQueueCreateInfos = &devqInfo;
+	devCreateInfo.queueCreateInfoCount = 1;
+	devCreateInfo.pEnabledFeatures = &devFeatures;
+
+	//actually create our device
+	vk::Device dev = devices[0].pdev.createDevice(devCreateInfo);
+	
+	
+	
+	vk::Queue computeQ;
+	computeQ = dev.getQueue(devqInfo.queueFamilyIndex, 0);
+
+
 
     instance.destroy();
 
     return 0;
 }
+
+
