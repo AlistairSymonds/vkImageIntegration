@@ -3,7 +3,7 @@
 #include "vkImageIntegrationLib.h"
 namespace vkII {
 
-	vkImageIntegration::vkImageIntegration(vk::Device device)
+	vkImageIntegration::vkImageIntegration(vk::Device device, vk::Queue queue)
 	{
 	}
 

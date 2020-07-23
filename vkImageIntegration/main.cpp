@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 
+#include <vkImageIntegrationLib.h>
 
 using namespace std;
 
@@ -68,6 +69,7 @@ int main()
     std::vector<const char*> layers;
 #if defined(_DEBUG)
     layers.push_back("VK_LAYER_KHRONOS_validation");
+
 #endif
 
     // VkApplicationInfo allows the programmer to specifiy some basic information about the
@@ -122,6 +124,10 @@ int main()
 	
 	vk::Queue computeQ;
 	computeQ = dev.getQueue(devqInfo.queueFamilyIndex, 0);
+
+	vkII::vkImageIntegration integrator = vkII::vkImageIntegration(dev, computeQ);
+
+	vkII::Image img1(10000, 10000);
 
 
 	dev.destroy();

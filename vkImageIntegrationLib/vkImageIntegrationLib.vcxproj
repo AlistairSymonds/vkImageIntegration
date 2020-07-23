@@ -155,10 +155,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="vkII_types.h" />
     <ClInclude Include="vkII_util.h" />
     <ClInclude Include="vkImageIntegrationLib.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="vkII_util.cpp" />
     <ClCompile Include="vkImageIntegrationLib.cpp" />
   </ItemGroup>
