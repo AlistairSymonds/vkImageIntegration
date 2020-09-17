@@ -39,7 +39,7 @@ namespace vkII {
 
 	vk::Result vkII::Image::moveToHost()
 	{
-		this->moveToHost = DataLocation::eHOST;
+		this->dataLoc = DataLocation::eHOST;
 		return vk::Result();
 	}
 }
