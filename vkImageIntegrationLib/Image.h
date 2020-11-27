@@ -28,9 +28,11 @@ namespace vkII {
 
 		vk::Result moveToHost();
 		
-
+		~Image();
 	private:
+		float * data;
 		vk::Image* img;
+		vk::ImageCreateInfo imageInfo;
 		DataLocation dataLoc = eHOST;
 
 	};

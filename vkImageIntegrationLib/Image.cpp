@@ -15,7 +15,7 @@ namespace vkII {
 		}
 #endif
 
-		vk::ImageCreateInfo imageInfo;
+		
 		imageInfo.imageType = vk::ImageType::e2D;
 		imageInfo.mipLevels = 0;
 		imageInfo.extent.depth = 1;
@@ -23,6 +23,8 @@ namespace vkII {
 		imageInfo.extent.width = w;
 		imageInfo.tiling = vk::ImageTiling::eOptimal;
 		imageInfo.sharingMode = vk::SharingMode::eExclusive;
+		//for CPU backed data
+		data = new float[h * w];
 
 	}
 
@@ -41,5 +43,9 @@ namespace vkII {
 	{
 		this->dataLoc = DataLocation::eHOST;
 		return vk::Result();
+	}
+
+	vkII::Image::~Image() {
+		delete data;
 	}
 }

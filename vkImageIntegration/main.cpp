@@ -81,58 +81,14 @@ int main()
         .setEngineVersion(1)
         .setApiVersion(VK_API_VERSION_1_0);
 
-    // VkInstanceCreateInfo is where the programmer specifies the layers and/or extensions that
-    // are needed. For now, none are enabled.
-    vk::InstanceCreateInfo instInfo = vk::InstanceCreateInfo()
-        .setFlags(vk::InstanceCreateFlags())
-        .setPApplicationInfo(&appInfo)
-        .setEnabledExtensionCount(0)
-        .setPpEnabledExtensionNames(NULL)
-        .setEnabledLayerCount(static_cast<uint32_t>(layers.size()))
-        .setPpEnabledLayerNames(layers.data());
 
-    // Create the Vulkan instance.
-    vk::Instance instance;
-    try {
-        instance = vk::createInstance(instInfo);
-    } catch(std::exception e) {
-        std::cout << "Could not create a Vulkan instance: " << e.what() << std::endl;
-        return 1;
-    }
 
-	auto devices = get_supported_devices(instance);
-	
-	//setup queue info
-	vk::DeviceQueueCreateInfo devqInfo = vk::DeviceQueueCreateInfo();
-	devqInfo.queueFamilyIndex = devices[0].q_idxs[0];
-	devqInfo.queueCount = 1;
-	float q_priority = 1.0f;
-	devqInfo.pQueuePriorities = &q_priority;
-
-	//select features
-	vk::PhysicalDeviceFeatures devFeatures = vk::PhysicalDeviceFeatures();
-
-	vk::DeviceCreateInfo devCreateInfo = vk::DeviceCreateInfo();
-	devCreateInfo.pQueueCreateInfos = &devqInfo;
-	devCreateInfo.queueCreateInfoCount = 1;
-	devCreateInfo.pEnabledFeatures = &devFeatures;
-
-	//actually create our device
-	vk::Device dev = devices[0].pdev.createDevice(devCreateInfo);
-	
-	
-	
-	vk::Queue computeQ;
-	computeQ = dev.getQueue(devqInfo.queueFamilyIndex, 0);
-
-	vkII::vkImageIntegration integrator = vkII::vkImageIntegration(dev, computeQ);
+	vkII::vkImageIntegration integrator = vkII::vkImageIntegration();
 
 	vkII::Image img1(10000, 10000);
 
+	integrator.do_comp();
 
-	dev.destroy();
-
-    instance.destroy();
 
     return 0;
 }

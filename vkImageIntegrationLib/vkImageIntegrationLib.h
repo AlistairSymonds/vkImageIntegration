@@ -1,5 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
+#include <kompute/Kompute.hpp>
 
 #include "Image.h"
 
@@ -7,12 +8,12 @@ namespace vkII {
 	class vkImageIntegration
 	{
 	public:
-		vkImageIntegration(vk::Device device, vk::Queue queue);
+		vkImageIntegration();
 		~vkImageIntegration();
+		void do_comp();
 
 	private:
-		vk::Device dev;
-		vk::Queue q;
+		
 	};
 
 }
